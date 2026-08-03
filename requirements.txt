@@ -1,0 +1,6 @@
+pydicom==3.0.1
+tqdm==4.67.1
+
+# jupyter
+jupyter
+ipython

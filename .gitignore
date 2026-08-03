@@ -1,0 +1,7 @@
+year_3/__pycache__/
+.venv/
+__pycache__/
+*.pyc
+year_3/__pycache__/*
+dicom_metadata.csv
+.DS_Store
