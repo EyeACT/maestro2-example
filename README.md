@@ -21,10 +21,8 @@ single DICOM file, useful for debugging at any point in the pipeline.
 
 - A Windows machine with PowerShell, to run the preprocessing step (Topcon's exporter is a
   native `.exe`).
-- Topcon's **DICOM OCT Export** tool, installed at the **research license level**. The
-  standard license only exports structural OCT/fundus DICOM - the research level is required
-  to also export OCTA flow volumes, en face renders, and segmentation data, which this
-  pipeline expects. Request access from
+- Topcon's **DICOM OCT Export** tool, which this pipeline uses to export OCTA flow volumes,
+  en face renders, and segmentation data alongside the structural OCT/fundus DICOM. Download it from
   [Topcon Healthcare](https://topconhealthcare.com/article/topcon-healthcare-expands-access-to-standardized-dicom-oct-imaging-data/).
 - Python 3.12 and [mise](https://mise.jdx.dev/getting-started.html) + `uv`, for the processing
   step (mise installs `uv` automatically, see `mise.toml`).
@@ -45,7 +43,7 @@ uv pip install -r requirements.txt
 ## Step 1: Preprocess raw .fda files into DICOM
 
 `process-maestro2-fda.ps1` wraps Topcon's `DicomOctExport.exe` (installed as part of the
-research-level tool above) and batch-converts every `.fda` file it finds.
+tool above) and batch-converts every `.fda` file it finds.
 
 1. **Required:** open the script and replace the placeholder paths at the top with real ones
    for your machine - it will not run correctly until you do:
@@ -65,7 +63,7 @@ inside the matching `_output` folder and runs the exporter with
 
 - the structural OCT volume and fundus photo (always)
 - the OCTA flow volume, its en face renders, and the retinal layer segmentation (when the
-  scan includes OCTA data - this requires the research license)
+  scan includes OCTA data)
 
 It retries up to 3 times per file if the expected file count (8 for a full OCTA scan, 3 for a
 structural-only scan) isn't produced.
@@ -94,7 +92,7 @@ This produces, under `OUTPUT_FOLDER`:
   `SeriesDescription` tags - see `PROTOCOL_MAP` in the script)
 - one `manifest.tsv` per modality folder, listing every scan (patient ID, laterality,
   anatomic region, imaging type, image dimensions, and file path) - this is where the OCTA
-  scans exported via the research-level license show up alongside the structural OCT data
+  scans show up alongside the structural OCT data
 - `logs/organize_log.csv` and `logs/organize_manifest.csv` recording anything that failed to
   process and every file that was copied
 

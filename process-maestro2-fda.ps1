@@ -5,8 +5,7 @@
 .DESCRIPTION
     Wraps Topcon's DicomOctExport.exe (installed with the DICOM OCT Export tool,
     see README) to convert every .fda file under $BaseRoot into a folder of
-    standard DICOM files. Requires the RESEARCH license level of the tool -
-    the standard license does not export OCTA flow/en face/segmentation data.
+    standard DICOM files.
 
     Must be run on Windows (the exporter is a native .exe), via PowerShell:
         .\process-maestro2-fda.ps1
@@ -14,7 +13,7 @@
     REQUIRED: update the three variables below for your machine before running.
 #>
 
-$DICOM_OCT_EXPORT_EXE = "C:\path\to\OCT_v2\FdaFileParser\exe\DicomOctExport.exe"
+$DICOM_OCT_EXPORT_EXE = "C:\path\to\DicomOctExport.exe"
 $BaseRoot = "D:\path\to\raw\maestro2"
 $GlobalOutputRoot = "D:\path\to\preprocessed\maestro2"
 
@@ -78,7 +77,7 @@ foreach ($folder in $InputFolders) {
                 Get-ChildItem -Path $outputFolder -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
                 # Run the EXE. Flags:
-                #   -octa        export OCTA flow volume (research license required)
+                #   -octa        export OCTA flow volume
                 #   -enfaceSlabs export en face slab renders
                 #   -segDcm      export retinal layer segmentation as DICOM
                 #   -dcm         export structural OCT/fundus DICOM
