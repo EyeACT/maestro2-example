@@ -21,10 +21,9 @@ from datetime import datetime
 import pydicom
 from tqdm import tqdm
 
-
 # REQUIRED: update these two paths for your machine before running.
-INPUT_FOLDER = "/path/to/preprocessed/maestro2_output"
-OUTPUT_FOLDER = "/path/to/organized/maestro2_final"
+INPUT_FOLDER = r"/path/to/preprocessed/maestro2_output"
+OUTPUT_FOLDER = r"/path/to/organized/maestro2_output"
 
 DEVICE_FOLDER = "topcon_maestro2"
 
@@ -33,10 +32,18 @@ PROTOCOL_MAP = {
     ("OP", "FundusPhoto"): ("retinal_photography", "cfp", "maestro2_fundus"),
     ("OP", "IR"): ("retinal_photography", "ir", "maestro2_ir"),
     ("OP", "FAF"): ("retinal_photography", "faf", "maestro2_faf"),
-    ("OPT", "OCT 3D H Macula"): ("retinal_oct", "structural_oct", "maestro2_oct_macula"),
+    ("OPT", "OCT 3D H Macula"): (
+        "retinal_oct",
+        "structural_oct",
+        "maestro2_oct_macula",
+    ),
     ("OPT", "OCT 3D H Wide"): ("retinal_oct", "structural_oct", "maestro2_oct_wide"),
     ("OPT", "OCT 3D H Disc"): ("retinal_oct", "structural_oct", "maestro2_oct_disc"),
-    ("OPT", "OCT 3D H External"): ("retinal_oct", "structural_oct", "maestro2_oct_external"),
+    ("OPT", "OCT 3D H External"): (
+        "retinal_oct",
+        "structural_oct",
+        "maestro2_oct_external",
+    ),
     ("OPTBSV", "OCTA Flow Volume Raw Data - for processing"): (
         "retinal_octa",
         "flow_cube",
@@ -47,6 +54,11 @@ PROTOCOL_MAP = {
         "retinal_octa",
         "segmentation",
         "maestro2_segmentation",
+    ),
+    ("OPT", "OCT 5LineCross Macula"): (
+        "retinal_oct",
+        "structural_oct",
+        "maestro2_oct_5linecross",
     ),
 }
 
@@ -170,11 +182,16 @@ def organize_file(file_path, output_folder, manifest_writer):
         }
     )
 
-    anatomic_region, imaging = MANIFEST_META.get((modality, series_description), ("", ""))
+    anatomic_region, imaging = MANIFEST_META.get(
+        (modality, series_description), ("", "")
+    )
     return modality_folder, {
         "person_id": patient_id,
         "manufacturer": str(ds.get("Manufacturer", "Topcon")).strip() or "Topcon",
-        "manufacturers_model_name": str(ds.get("ManufacturerModelName", "Maestro2")).strip() or "Maestro2",
+        "manufacturers_model_name": str(
+            ds.get("ManufacturerModelName", "Maestro2")
+        ).strip()
+        or "Maestro2",
         "laterality": laterality.upper() if laterality != "unknown" else laterality,
         "anatomic_region": anatomic_region,
         "imaging": imaging,
@@ -243,7 +260,9 @@ def main(generate_manifest=True):
 
             for file_path in files:
                 try:
-                    modality_folder, tsv_record = organize_file(file_path, output_folder, manifest_writer)
+                    modality_folder, tsv_record = organize_file(
+                        file_path, output_folder, manifest_writer
+                    )
                     if generate_manifest:
                         tsv_records.setdefault(modality_folder, []).append(tsv_record)
                 except Exception as e:
