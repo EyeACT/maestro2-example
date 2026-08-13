@@ -64,45 +64,9 @@ foreach ($folder in $InputFolders) {
                 New-Item -Path $outputFolder -ItemType Directory | Out-Null
             }
 
-            # Retry loop (max 3 times) - the exporter occasionally writes a
-            # truncated set of files, so re-run until the expected count shows up.
-            $maxRetries = 3
-            $retryCount = 0
-            $success = $false
-
-            while (-not $success -and $retryCount -lt $maxRetries) {
-                $retryCount++
-
-                # Clean folder before retry
-                Get-ChildItem -Path $outputFolder -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-
-                # Run the EXE. Flags:
-                #   -octa        export OCTA flow volume
-                #   -enfaceSlabs export en face slab renders
-                #   -segDcm      export retinal layer segmentation as DICOM
-                #   -dcm         export structural OCT/fundus DICOM
-                & $DICOM_OCT_EXPORT_EXE $inputFile $outputFolder -octa -enfaceSlabs -segDcm -dcm
-
-                # Wait a bit to ensure files are written
-                Start-Sleep -Seconds 2
-
-                # Count files created
-                $fileCount = (Get-ChildItem -Path $outputFolder -File | Measure-Object).Count
-
-                # 8 files = full OCTA scan (OCT + OCTA + enface + segmentation),
-                # 3 files = structural-only scan (no OCTA data acquired for this eye).
-                if ($fileCount -eq 8 -or $fileCount -eq 3) {
-                    $success = $true
-                    Write-Host "SUCCESS: $inputFile -> $fileCount files created."
-                }
-                else {
-                    Write-Host "WARNING: $inputFile -> $fileCount files created (attempt $retryCount). Retrying..."
-                }
-            }
-
-            if (-not $success) {
-                Write-Host "FAILED: $inputFile -> Did not reach 8 or 3 files after $maxRetries attempts." -ForegroundColor Red
-            }
+            # Run the EXE. Flags:
+            #   -allDcm: export all as DICOM files.
+            & $DICOM_OCT_EXPORT_EXE $inputFile $outputFolder -allDcm
         }
     }
 }
