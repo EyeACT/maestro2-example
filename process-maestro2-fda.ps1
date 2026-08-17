@@ -45,16 +45,7 @@ foreach ($folder in $InputFolders) {
             $parentFolder = $_.Directory.Name
             $fileNameNoExt = $_.BaseName
 
-            # UAB exports nest an extra folder level, so include the grandparent
-            # to keep output folder names unique across sites.
-            if ($_.Directory.FullName -match "UAB") {
-                # include grandparent as well
-                $grandParentFolder = Split-Path $_.Directory.FullName -Parent | Split-Path -Leaf
-                $outputFolderName = "${grandParentFolder}_${parentFolder}_${fileNameNoExt}_fda"
-            }
-            else {
-                $outputFolderName = "${parentFolder}_${fileNameNoExt}_fda"
-            }
+            $outputFolderName = "${parentFolder}_${fileNameNoExt}_fda"
 
             # This is the "batch folder" that process_maestro2-dcm.py later reads,
             # one per source .fda file.
